@@ -70,10 +70,28 @@ def add_item():
     my_entry.delete(0, END)
 
 def cross_off_item():
-    pass
+    my_list.itemconfig(
+        my_list.curselection(),
+        fg="#dedede"
+    )
+
+    my_list.selection_clear(0, END)
 
 def uncross_item():
-    pass
+    my_list.itemconfig(
+        my_list.curselection(),
+        fg="#464646"
+    )
+
+    my_list.selection_clear(0, END)
+
+def delete_crossed():
+    count = 0
+    while count < my_list.size():
+        if my_list.itemcget(count, "fg") == "#dedede":
+            my_list.delete(my_list.index(count))
+
+        count += 1
 
 #Buttons
 delete_button = Button(
@@ -100,9 +118,16 @@ uncross_button = Button(
     command=uncross_item
 )
 
+delete_crossed_button = Button(
+    button_frame,
+    text="Delete Crossed",
+    command=delete_crossed
+)
+
 delete_button.grid(row=0, column=0)
 add_button.grid(row=0, column=1, padx=20)
 cross_off_button.grid(row=0, column=2)
 uncross_button.grid(row=0, column=3, padx=20)
+delete_crossed_button.grid(row=0, column=4)
 
 root.mainloop()

@@ -37,13 +37,6 @@ my_list.pack(
     fill=BOTH
 )
 
-#Dummy list
-#stuff = ["Fazer a capa", "Fazer contra-capa", "Escrever agradecimentos", "Escrever epígrafe"]
-
-#Add dummy list to listbox
-#for item in stuff:
- #   my_list.insert(END, item)
-
 #Create scrollbar
 my_scrollbar = Scrollbar(my_frame)
 my_scrollbar.pack(

@@ -2,15 +2,26 @@ from tkinter import *
 from tkinter.font import Font
 from tkinter import filedialog
 import pickle
+import os
+
+# Set a default file path for automatic saving
+default_file = "C:\\Users\\laura\\OneDrive\\Documents\\TodoList"
 
 root = Tk()
 root.title('To-Do List!')
-root.geometry("500x500")
+root.geometry("600x500")
+
+#Define font
+list_font = Font(
+    family="Courier New",
+    size=10,
+    weight="bold"
+)
 
 #Define font
 my_font = Font(
-    family="Brush Script MT",
-    size=30,
+    family="Courier New",
+    size=10,
     weight="bold"
 )
 
@@ -21,9 +32,9 @@ my_frame.pack(pady=10)
 #Create listbox
 my_list = Listbox(
     my_frame,
-    font=my_font,
-    width=25,
-    height=5,
+    font=list_font,
+    width=53,
+    height=20,
     bg="SystemButtonFace",
     bd=0,
     fg="#464646",
@@ -49,7 +60,7 @@ my_list.config(yscrollcommand=my_scrollbar.set)
 my_scrollbar.config(command=my_list.yview)
 
 #Entry box
-my_entry = Entry(root, font=("Helvetica", 24))
+my_entry = Entry(root, font=("Courier New", 14), width=40)
 my_entry.pack(pady=20)
 
 #Button frame
@@ -57,12 +68,18 @@ button_frame = Frame(root)
 button_frame.pack(pady=20)
 
 #Functions
-def delete_item():
-    my_list.delete(ANCHOR)
 
-def add_item():
-    my_list.insert(END, my_entry.get())
-    my_entry.delete(0, END)
+def delete_item(event=None):
+    my_list.delete(ANCHOR)  # Delete the currently selected item
+
+def add_item(event=None):
+    item = my_entry.get().strip()  # Get input and strip whitespace
+    if item:  # Check if input is not empty
+        my_list.insert(END, item)  # Insert item into the listbox
+        my_entry.delete(0, END)  # Clear the entry box
+
+my_entry.bind('<Return>', add_item)
+my_list.bind('<BackSpace>', delete_item)
 
 def cross_off_item():
     my_list.itemconfig(
@@ -88,14 +105,11 @@ def delete_crossed():
 
         count += 1
 
-def save_list():
-    file_name = filedialog.asksaveasfilename(
-        initialdir="C:/gui/data",
+def save_list(auto_save=False):
+    file_name = default_file if auto_save else filedialog.asksaveasfilename(
+        initialdir="C:\\Users\\laura\\OneDrive\\Documents\\TodoList",
         title="Save File",
-        filetypes=(
-            ("Dat Files", "*.dat"),
-            ("All Files", "*.*")
-        )
+        filetypes=(("Dat Files", "*.dat"), ("All Files", "*.*"))
     )
 
     if file_name:
@@ -104,27 +118,24 @@ def save_list():
         else:
             file_name = f'{file_name}.dat'
 
-        #Delete crossed off items before saving
+        # Delete crossed off items before saving
         count = 0
         while count < my_list.size():
             if my_list.itemcget(count, "fg") == "#dedede":
                 my_list.delete(my_list.index(count))
-
             else:
                 count += 1
 
-        #grab all the stuffa from the list
+        # Grab all the items from the list
         stuff = my_list.get(0, END)
 
-        #open the file
-        output_file = open(file_name, 'wb')
-
-        #Add the stuff to the file
-        pickle.dump(stuff, output_file)
+        # Open the file for saving
+        with open(file_name, 'wb') as output_file:
+            pickle.dump(stuff, output_file)
 
 def open_list():
     file_name = filedialog.askopenfilename(
-        initialdir="C:/gui/data",
+        initialdir="C:\\Users\\laura\\OneDrive\\Documents\\TodoList",
         title="Open FIle",
         filetypes=(
             ("Dat Files", "*.dat"),
@@ -163,35 +174,40 @@ file_menu.add_command(label="Open List", command=open_list)
 file_menu.add_separator()
 file_menu.add_command(label="Clear List", command=delete_list)
 
-#Buttons
+# Main buttons
 delete_button = Button(
     button_frame,
     text="Delete",
-    command=delete_item
+    command=delete_item,
+    font=my_font
 )
 
 add_button = Button(
     button_frame,
     text="Add",
-    command=add_item
+    command=add_item,  # Button still uses add_item
+    font=my_font
 )
 
 cross_off_button = Button(
     button_frame,
     text="Cross Off",
-    command=cross_off_item
+    command=cross_off_item,
+    font=my_font
 )
 
 uncross_button = Button(
     button_frame,
     text="Uncross",
-    command=uncross_item
+    command=uncross_item,
+    font=my_font
 )
 
 delete_crossed_button = Button(
     button_frame,
     text="Delete Crossed",
-    command=delete_crossed
+    command=delete_crossed,
+    font=my_font
 )
 
 delete_button.grid(row=0, column=0)
@@ -200,4 +216,5 @@ cross_off_button.grid(row=0, column=2)
 uncross_button.grid(row=0, column=3, padx=20)
 delete_crossed_button.grid(row=0, column=4)
 
+# Main loop
 root.mainloop()
